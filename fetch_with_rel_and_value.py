@@ -20,6 +20,7 @@ def get_arg_parser():
     parser.add_argument('--data', type = str, default = 'data/processed/entity_rels', help = 'path to output directory')
     parser.add_argument('--rel', type = str, default='P413', help ='relationship')
     parser.add_argument('--entity', type = str, default='Q622747', help ='entity value')
+    parser.add_argument('--num_procs', type = int, default=10, help ='Number of processes')
     return parser 
 
 
@@ -35,7 +36,7 @@ def main():
     args = get_arg_parser().parse_args()
 
     table_files = get_batch_files(args.data)
-    pool = Pool(processes = 10)
+    pool = Pool(processes = args.num_procs)
     filtered = []
     for output in tqdm(
         pool.imap_unordered(

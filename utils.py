@@ -40,7 +40,7 @@ def append_to_jsonl_file(data, file):
     """ Appends json dictionary as new line to file """
     with open(file, 'a+') as out_file:
         for x in data:
-            out_file.write(json.dumps(x)+"\n")
+            out_file.write(json.dumps(x, ensure_ascii=False)+"\n")
 
 
 def get_batch_files(fdir):
