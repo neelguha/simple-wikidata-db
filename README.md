@@ -17,24 +17,24 @@ wget https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.gz
 ``` 
 or, if aria2c is installed, run: 
 ```
-aria2c https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.gz
+aria2c --max-connection-per-server 16 https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.gz
 ```
 
-Downloading takes about 5 hours (depending on bandwidth). As of January 2020, uncompressed file is ~960GB. 
+Downloading takes about 2-5 hours (depending on bandwidth).
 
 ## Processing the dump 
-The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). To preprocess the dump, run: 
+The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the compressed file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). To preprocess the dump, run: 
 
 ```
 python3 preprocess_dump.py \ 
-    --input_file $PATH_TO_UNCOMPRESSED_WIKI_JSON \
+    --input_file $PATH_TO_COMPRESSED_WIKI_JSON \
     --out_dir $DIR_TO_SAVE_DATA_TO \
     --batch_size $BATCH_SIZE \
     --language_id $LANG
 ```
 
 These arguments are: 
-- `input_file`: path to the uncompressed JSON Wikidata dump json file 
+- `input_file`: path to the compressed JSON Wikidata dump json file 
 - `out_dir`: path to directory where tables will be written. Subdirectories will be created under this directory for each table. 
 - `batch_size`: The number of triples to write into each batch file that is saved under a table directory. 
 - `language_id`: The language to use when extracting entity labels, aliases, descriptions, and wikipedia links 

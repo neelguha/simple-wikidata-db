@@ -2,6 +2,14 @@ from multiprocessing import Queue, Value
 from pathlib import Path
 import gzip
 
+def count_lines(input_file: Path, max_lines_to_read: int):
+    cnt = 0
+    with gzip.open(input_file, 'rb') as f:
+        for _ in f:
+            cnt += 1
+            if max_lines_to_read > 0 and cnt >= max_lines_to_read:
+                break
+    return cnt
 
 def read_data(input_file: Path, num_lines_read: Value, max_lines_to_read: int, work_queue: Queue):
     """
@@ -24,6 +32,5 @@ def read_data(input_file: Path, num_lines_read: Value, max_lines_to_read: int, w
             work_queue.put(obj)
             if 0 < max_lines_to_read <= num_lines:
                 break
-    work_queue.put(None)
     num_lines_read.value = num_lines
     return

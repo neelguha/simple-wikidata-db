@@ -5,7 +5,7 @@ This script preprocesses the raw Wikidata dump (in JSON format) and sorts triple
 Example command: 
 
 python3 preprocess_dump.py \ 
-    --input_file /lfs/raiders8/0/lorr1/wikidata/raw_data/latest-all.json \
+    --input_file /lfs/raiders8/0/lorr1/wikidata/raw_data/latest-all.json.gz \
     --out_dir data/processed
 
 """
@@ -15,7 +15,7 @@ from multiprocessing import Queue, Process
 from pathlib import Path
 import time
 
-from preprocess_utils.reader_process import read_data
+from preprocess_utils.reader_process import count_lines, read_data
 from preprocess_utils.worker_process import process_data
 from preprocess_utils.writer_process import write_data
 
@@ -27,8 +27,9 @@ def get_arg_parser():
     parser.add_argument('--language_id', type=str, default='en', help='language identifier')
     parser.add_argument('--processes', type=int, default=90, help="number of concurrent processes to spin off. ")
     parser.add_argument('--batch_size', type=int, default=10000)
-    parser.add_argument('--test', action='store_true',
-                        help='Test run that terminates after 1 batch is processed. Useful for debugging.')
+    parser.add_argument('--num_lines_read', type=int, default=-1,
+                        help='Terminate after num_lines_read lines are read. Useful for debugging.')
+    parser.add_argument('--num_lines_in_dump', type=int, default=-1, help='Number of lines in dump. If -1, we will count the number of lines.')
     return parser
 
 
@@ -43,6 +44,15 @@ def main():
     input_file = Path(args.input_file)
     assert input_file.exists(), f"Input file {input_file} does not exist"
 
+    
+    max_lines_to_read = args.num_lines_read
+    if args.num_lines_in_dump <= 0:
+        print("Counting lines")
+        total_num_lines = count_lines(input_file, max_lines_to_read)
+    else:
+        total_num_lines = args.num_lines_in_dump
+
+    print("Starting processes")
     maxsize = 10 * args.processes
 
     # Queues for inputs/outputs
@@ -51,16 +61,16 @@ def main():
 
     # Processes for reading/processing/writing
     num_lines_read = multiprocessing.Value("i", 0)
-    max_lines_to_read = -1 if not args.test else 1000
     read_process = Process(
         target=read_data,
         args=(input_file, num_lines_read, max_lines_to_read, work_queue)
     )
+
     read_process.start()
 
     write_process = Process(
         target=write_data,
-        args=(out_dir, args.batch_size, output_queue)
+        args=(out_dir, args.batch_size, total_num_lines, output_queue)
     )
     write_process.start()
 
@@ -75,10 +85,13 @@ def main():
         work_processes.append(work_process)
 
     read_process.join()
-    print(num_lines_read.value)
+    print(f"Done! Read {num_lines_read.value} lines")
+    # Cause all worker process to quit
+    for work_process in work_processes:
+        work_queue.put(None)
+    # Now join the work processes
     for work_process in work_processes:
         work_process.join()
-
     output_queue.put(None)
     write_process.join()
 
