@@ -5,18 +5,18 @@ to run:
 python3.6 fetch_aliases.py --data $DATA --out_dir $OUT --qid Q30
 """ 
 
-    
-import os, json, argparse, time, shutil
+import argparse
 from tqdm import tqdm 
 from multiprocessing import Pool
 from functools import partial 
 
-from utils import *
+from fetching.utils import jsonl_generator, get_batch_files
 
 def get_arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', type = str, default = 'data/processed/aliases', help = 'path to output directory')
     parser.add_argument('--name', type = str, default='Victoria', help ='name to search for')
+    parser.add_argument('--num_procs', type = int, default=10, help ='Number of processes')
     return parser 
 
 
@@ -28,11 +28,10 @@ def filtering_func(target_name, filename):
     return filtered
 
 def main():
-    start = time.time()
     args = get_arg_parser().parse_args()
 
     table_files = get_batch_files(args.data)
-    pool = Pool(processes = 10)
+    pool = Pool(processes = args.num_procs)
     filtered = []
     for output in tqdm(
         pool.imap_unordered(
