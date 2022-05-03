@@ -9,33 +9,35 @@ This library is helpful if you'd like to issue queries like:
 - Fetch all aliases for a QID
 
 
-
-
 ## Downloading the dump 
 
 A full list of available dumps is available [here](https://dumps.wikimedia.org/wikidatawiki/entities/). To fetch the most recent dump, run: 
 ```
 wget https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.gz
 ``` 
+or, if aria2c is installed, run: 
+```
+aria2c --max-connection-per-server 16 https://dumps.wikimedia.org/wikidatawiki/entities/latest-all.json.gz
+```
 
-Downloading takes about 5 hours (depending on bandwidth). As of January 2020, uncompressed file is ~960GB. 
+Downloading takes about 2-5 hours (depending on bandwidth).
 
 ## Processing the dump 
-The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). To preprocess the dump, run: 
+The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the compressed file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). To preprocess the dump, run: 
 
 ```
 python3 preprocess_dump.py \ 
-    --input_file $PATH_TO_UNCOMPRESSED_WIKI_JSON \
+    --input_file $PATH_TO_COMPRESSED_WIKI_JSON \
     --out_dir $DIR_TO_SAVE_DATA_TO \
-    --total_lines $NUMBER_OF_LINES_IN_DUMP \
     --batch_size $BATCH_SIZE \
     --language_id $LANG
 ```
 
 These arguments are: 
-- `input_file`: path to the uncompressed JSON Wikidata dump json file 
+- `input_file`: path to the compressed JSON Wikidata dump json file 
 - `out_dir`: path to directory where tables will be written. Subdirectories will be created under this directory for each table. 
-- `total_lines`: specifies the total number of lines in the uncompressed json file. This is used by a tqdm bar to track progress. As of January 2022, there are 95,980,335 lines in latest-all.json. It takes about ~21 minutes to run `wc -l latest-all.json`. 
+- 'num_lines_read': number of lines to read. Useful for debuggin.
+- `num_lines_in_dump`: specifies the total number of lines in the uncompressed json file. This is used by a tqdm bar to track progress. As of January 2022, there are 95,980,335 lines in latest-all.json. It takes about ~21 minutes to run `wc -l latest-all.json`. 
 - `batch_size`: The number of triples to write into each batch file that is saved under a table directory. 
 - `language_id`: The language to use when extracting entity labels, aliases, descriptions, and wikipedia links 
 
@@ -66,8 +68,8 @@ Each table is stored in a directory, where the content of the table is written t
 ## Querying scripts 
 Two scripts are provided as examples of how to write parallelized queries over the data once it's been preprocessed: 
 
-- `fetch_with_name.py`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
-- `fetch_with_rel_and_value.py`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
+- `fatching/fetch_with_name.py`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
+- `fatching/fetch_with_rel_and_value.py`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
 
 
 **For any questions or feedback, contact Neel Guha at nguha@cs.stanford.edu**
