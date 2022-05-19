@@ -1,10 +1,10 @@
 """ Wikidata Dump Processor
 
-This script preprocesses the raw Wikidata dump (in JSON format) and sorts triples into 8 "tables": labels, descriptions, aliases, entity_rels, external_ids, entity_values, qualifiers, and wikipedia_links. See the README for more information on each table. 
+This script preprocesses the raw Wikidata dump (in JSON format) and sorts triples into 8 "tables": labels, descriptions, aliases, entity_rels, external_ids, entity_values, qualifiers, and wikipedia_links. See the README for more information on each table.
 
-Example command: 
+Example command:
 
-python3 preprocess_dump.py \ 
+python3 preprocess_dump.py \
     --input_file /lfs/raiders8/0/lorr1/wikidata/raw_data/latest-all.json.gz \
     --out_dir data/processed
 
@@ -15,9 +15,9 @@ from multiprocessing import Queue, Process
 from pathlib import Path
 import time
 
-from preprocess_utils.reader_process import count_lines, read_data
-from preprocess_utils.worker_process import process_data
-from preprocess_utils.writer_process import write_data
+from simple_wikidata_db.preprocess_utils.reader_process import count_lines, read_data
+from simple_wikidata_db.preprocess_utils.worker_process import process_data
+from simple_wikidata_db.preprocess_utils.writer_process import write_data
 
 
 def get_arg_parser():
@@ -44,7 +44,7 @@ def main():
     input_file = Path(args.input_file)
     assert input_file.exists(), f"Input file {input_file} does not exist"
 
-    
+
     max_lines_to_read = args.num_lines_read
     if args.num_lines_in_dump <= 0:
         print("Counting lines")
