@@ -1,4 +1,4 @@
-"""Assortment of useful utility functions 
+"""Assortment of useful utility functions
 """
 
 import os
@@ -44,7 +44,7 @@ def append_to_jsonl_file(data, file):
 
 
 def get_batch_files(fdir):
-    """ Returns paths to files in fdir """ 
+    """ Returns paths to files in fdir """
     filenames = os.listdir(fdir)
     filenames = [os.path.join(fdir, f) for f in filenames]
     print(f"Fetched {len(filenames)} files from {fdir}")
