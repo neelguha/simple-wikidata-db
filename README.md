@@ -68,8 +68,8 @@ Each table is stored in a directory, where the content of the table is written t
 ## Querying scripts 
 Two scripts are provided as examples of how to write parallelized queries over the data once it's been preprocessed: 
 
-- `fatching/fetch_with_name.py`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
-- `fatching/fetch_with_rel_and_value.py`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
+- `fetching/fetch_with_name.py`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
+- `fetching/fetch_with_rel_and_value.py`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
 
 ## Other helpful resources: 
 
