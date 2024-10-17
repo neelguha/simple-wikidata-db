@@ -33,16 +33,17 @@ python3 preprocess_dump.py \
     --language_id $LANG
 ```
 
-These arguments are: 
-- `input_file`: path to the compressed JSON Wikidata dump json file 
-- `out_dir`: path to directory where tables will be written. Subdirectories will be created under this directory for each table. 
-- 'num_lines_read': number of lines to read. Useful for debuggin.
-- `num_lines_in_dump`: specifies the total number of lines in the uncompressed json file. This is used by a tqdm bar to track progress. As of January 2022, there are 95,980,335 lines in latest-all.json. It takes about ~21 minutes to run `wc -l latest-all.json`. 
-- `batch_size`: The number of triples to write into each batch file that is saved under a table directory. 
-- `language_id`: The language to use when extracting entity labels, aliases, descriptions, and wikipedia links 
+These arguments are:
+- `input_file` (required): path to the compressed JSON Wikidata dump json file
+- `out_dir` (required): path to directory where tables will be written. Subdirectories will be created under this directory for each table.
+- `num_lines_read` (default: -1): number of lines to read. Useful for debuggin.
+- `num_lines_in_dump` (default: -1): specifies the total number of lines in the uncompressed json file. This is used by a tqdm bar to track progress. As of January 2022, there are 95,980,335 lines in latest-all.json. It takes about ~21 minutes to run `wc -l latest-all.json`.
+- `batch_size` (default: 10000): The number of triples to write into each batch file that is saved under a table directory.
+- `language_id` (default `'en'`): The language to use when extracting entity labels, aliases, descriptions, and wikipedia links
 
-Additionally, running with the flag `--test` will terminate after processing an initial chunk, allowing you to verify results. 
+To do an initial verification of the pipeline, specify a small `num_lines_read` like 100. This should finish in less than a second.
 
+Providing `num_lines_in_dump` will provide a progress bar.
 
 It takes ~5 hours to process the dump when running with 90 processes on a 1024GB machine with 56 cores. A tqdm progress bar should provide a more accurate estimate while data is being processed.  
 
