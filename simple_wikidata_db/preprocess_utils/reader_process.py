@@ -2,6 +2,7 @@ from multiprocessing import Queue, Value
 from pathlib import Path
 import gzip
 import bz2
+from tqdm.auto import tqdm
 
 def count_lines(input_file: Path, max_lines_to_read: int):
     cnt = 0
@@ -12,7 +13,7 @@ def count_lines(input_file: Path, max_lines_to_read: int):
     else:
         raise ValueError(f"The file must be either .bz2 or .gz, but got {input_file.suffix}.")
 
-    for _ in f:
+    for _ in tqdm(f):
         cnt += 1
         if max_lines_to_read > 0 and cnt >= max_lines_to_read:
             break
