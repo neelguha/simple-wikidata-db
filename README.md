@@ -23,10 +23,10 @@ aria2c --max-connection-per-server 16 https://dumps.wikimedia.org/wikidatawiki/e
 Downloading takes about 2-5 hours (depending on bandwidth).
 
 ## Processing the dump 
-The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the compressed file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). To preprocess the dump, run: 
+The original downloaded wikidata dump is a single file and combines different types of information (alias names, properties, relations, etc). We preprocess the dump by iterating over the compressed file, and saving information to different subdirectories. For more information, see the [Data Format](#data-format). The preprocessing script lives at `simple_wikidata_db/preprocess_dump.py` and must be run as a module from the repository root (it imports itself as part of the `simple_wikidata_db` package). To preprocess the dump, run: 
 
 ```
-python3 preprocess_dump.py \ 
+python3 -m simple_wikidata_db.preprocess_dump \
     --input_file $PATH_TO_COMPRESSED_WIKI_JSON \
     --out_dir $DIR_TO_SAVE_DATA_TO \
     --batch_size $BATCH_SIZE \
@@ -40,6 +40,7 @@ These arguments are:
 - `num_lines_in_dump` (default: -1): specifies the total number of lines in the uncompressed json file. This is used by a tqdm bar to track progress. As of January 2022, there are 95,980,335 lines in latest-all.json. It takes about ~21 minutes to run `wc -l latest-all.json`.
 - `batch_size` (default: 10000): The number of triples to write into each batch file that is saved under a table directory.
 - `language_id` (default `'en'`): The language to use when extracting entity labels, aliases, descriptions, and wikipedia links
+- `processes` (default: 90): The number of concurrent processes to spin off.
 
 To do an initial verification of the pipeline, specify a small `num_lines_read` like 100. This should finish in less than a second.
 
@@ -67,10 +68,10 @@ Each table is stored in a directory, where the content of the table is written t
 
 
 ## Querying scripts 
-Two scripts are provided as examples of how to write parallelized queries over the data once it's been preprocessed: 
+Two scripts are provided as examples of how to write parallelized queries over the data once it's been preprocessed. Like the preprocessing script, these must be run as modules from the repository root: 
 
-- `fetching/fetch_with_name.py`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
-- `fetching/fetch_with_rel_and_value.py`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
+- `python3 -m fetching.fetch_with_name`: fetches all QIDs which are associated with a particular name. For example: all entities associated with the name 'Victoria', which would inclue entities like Victoria Beckham, or Victoria (Australia).
+- `python3 -m fetching.fetch_with_rel_and_value`: fetches all QIDs which have a relationship with a specific value. For example: all triples where the relation is P413 and the object of the relation is Q622747.
 
 ## Other helpful resources: 
 
